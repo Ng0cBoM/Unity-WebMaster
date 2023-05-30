@@ -10,7 +10,6 @@ public class Raycast : MonoBehaviour
     private float speed = 7f;
     private bool isMoving;
 
-
     void Start()
     {
         isMoving = false;
@@ -26,7 +25,7 @@ public class Raycast : MonoBehaviour
         if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, Mathf.Infinity))
         {
             Debug.DrawRay(transform.position, direction * hitInfo.distance, Color.red);
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && isMoving == false)
             {
                 isMoving = true;
                 StartCoroutine(MovePlayer(hitInfo.point));
@@ -38,7 +37,7 @@ public class Raycast : MonoBehaviour
     {
         Vector3 initialPosition = transform.position;
         float elapsedTime = 0f;
-        float duration = 1f; 
+        float duration = 1f;
 
         while (elapsedTime < duration)
         {
@@ -48,5 +47,6 @@ public class Raycast : MonoBehaviour
             yield return null;
         }
         transform.position = targetPosition;
+        isMoving = false;
     }
 }
