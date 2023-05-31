@@ -7,14 +7,16 @@ TagManager:
   - Wall
   - LeftWall
   - RightWall
+  - AboveWall
+  - UnderWall
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Map
   - Water
   - UI
-  - 
+  - Enemy
   - 
   - 
   - 

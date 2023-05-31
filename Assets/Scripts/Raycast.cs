@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class Raycast : MonoBehaviour
 {
-    private float speed = 7f;
     private bool isMoving;
 
     void Start()

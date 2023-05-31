@@ -7,9 +7,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private float speed = 7f;
-    private bool isMoving;
-    private Vector3 targetPosition;
+    private float speed = 13f;
+ 
     private Vector3 targetDirection;
 
     public GameObject linePrefab;
@@ -17,14 +16,25 @@ public class PlayerController : MonoBehaviour
 
     public GameObject origin;
     public GameObject handControll;
+    public GameObject arrow ;
+    public GameObject spiderWeb;
 
     public Animator animator;
+
+    private bool isMoving;
+    private string targetTag;
+
+    public LayerMask Wall;
+    public LayerMask Enemy;
+
+    private Enemy enemyForce;
 
     void Start()
     {
         isMoving = false;
-        targetPosition = transform.position;
         bulletLineRenderer = linePrefab.GetComponent<LineRenderer>();
+        linePrefab.SetActive(false);
+        spiderWeb.SetActive(false);
     }
 
     // Update is called once per frame
@@ -34,70 +44,107 @@ public class PlayerController : MonoBehaviour
         mousePosition.z = -Camera.main.transform.position.z;
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 directionMouse = (worldPosition - origin.transform.position).normalized;
+
         if (isMoving == false)
         {
             Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, directionMouse);
             handControll.transform.rotation = targetRotation;
-            if (Physics.Raycast(origin.transform.position, directionMouse, out RaycastHit hitInfo, Mathf.Infinity))
+
+            if (Physics.Raycast(origin.transform.position, directionMouse, out RaycastHit hitWall, Mathf.Infinity, Wall))
             {
+                Debug.DrawRay(origin.transform.position, directionMouse * hitWall.distance, Color.red);
                 if (Input.GetMouseButtonDown(0))
                 {
+                    if (Physics.Raycast(origin.transform.position, directionMouse, out RaycastHit hitEnemy, Mathf.Infinity, Enemy))
+                    {
+                        Debug.DrawRay(origin.transform.position, directionMouse * hitEnemy.distance, Color.green);
+                        if (hitEnemy.distance < hitWall.distance)
+                        {
+                            bulletLineRenderer.SetPosition(1, hitEnemy.point);
+                            spiderWeb.transform.position = hitEnemy.point;
+                            enemyForce = hitEnemy.collider.GetComponent<Enemy>();
+                            enemyForce.Pull(-directionMouse);
+                        }
+                    }
+                    else
+                    {
+                        bulletLineRenderer.SetPosition(1, hitWall.point);
+                        spiderWeb.transform.position = hitWall.point;
+                    }
+                    targetTag = hitWall.collider.gameObject.name;
+                    linePrefab.SetActive(true);
+                    arrow.SetActive(false);
                     isMoving = true;
                     animator.SetBool("isCliming", false);
-                    targetPosition = hitInfo.point;
+                    animator.SetBool("isHang", false);
                     targetDirection = directionMouse;
-                    bulletLineRenderer.SetPosition(1, hitInfo.point);
-                    //StartCoroutine(MovePlayer(hitInfo.point));
+                    spiderWeb.SetActive(true);
+                    
                 }
             }
         }
         else
         {
-            transform.position += targetDirection * speed * Time.deltaTime;
-            bulletLineRenderer.SetPosition(0, transform.position);
+            Move();
         }
-        
     }
 
-    //IEnumerator MovePlayer(Vector3 targetPosition)
-    //{
-    //    Vector3 initialPosition = origin.transform.position;
-    //    //float elapsedTime = 0f;
-    //    //float duration = 1f;
+    void Move()
+    {
+        transform.position += targetDirection * speed * Time.deltaTime;
+        bulletLineRenderer.SetPosition(0, origin.transform.position);
         
-    //    //while (elapsedTime < duration)
-    //    //{
-    //    //    float t = elapsedTime / duration;
-    //    //    transform.position = Vector3.Lerp(initialPosition, targetPosition, t);
-    //    //    bulletLineRenderer.SetPosition(0, origin.transform.position);
-    //    //    elapsedTime += Time.deltaTime;
-    //    //    yield return null;
-    //    //}
-    //     while (transform.position!=targetPosition)
-    //    {
-
-    //        yield return null;
-    //    }
-
-    //    bulletLineRenderer.SetPosition(0, transform.position);
-    //    transform.position = targetPosition;
-    //    isMoving = false;
-        
-    //}
-
-    private void OnCollisionEnter(Collision collision)
+    }
+    public void Stop()
     {
         isMoving = false;
-        if (collision.gameObject.CompareTag("RightWall"))
-        {
-            transform.localScale = new Vector3(5, transform.localScale.y, transform.localScale.z);
-            animator.SetBool("isCliming", true);
-        }
-        if (collision.gameObject.CompareTag("LeftWall"))
-        {
-            transform.localScale = new Vector3(-5, transform.localScale.y, transform.localScale.z);
-            animator.SetBool("isCliming", true);
-        }
+        linePrefab.SetActive(false);
+        arrow.SetActive(true);
+        spiderWeb.SetActive(false);
+    }
 
+   /* private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.name == targetTag)
+        {
+            Stop();
+            if (other.gameObject.CompareTag("RightWall"))
+            {
+                transform.localScale = new Vector3(5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isCliming", true);
+            }
+            if (other.gameObject.CompareTag("LeftWall"))
+            {
+                transform.localScale = new Vector3(-5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isCliming", true);
+            }
+            if (other.gameObject.CompareTag("UnderWall"))
+            {
+                transform.localScale = new Vector3(-5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isHang", true);
+            }
+        }
+    }*/
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == targetTag)
+        {
+            Stop();
+            if (collision.gameObject.CompareTag("RightWall"))
+            {
+                transform.localScale = new Vector3(5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isCliming", true);
+            }
+            if (collision.gameObject.CompareTag("LeftWall"))
+            {
+                transform.localScale = new Vector3(-5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isCliming", true);
+            }
+            if (collision.gameObject.CompareTag("UnderWall"))
+            {
+                transform.localScale = new Vector3(-5, transform.localScale.y, transform.localScale.z);
+                animator.SetBool("isHang", true);
+            }
+        }
     }
 }
