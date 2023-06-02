@@ -9,6 +9,7 @@ TagManager:
   - RightWall
   - AboveWall
   - UnderWall
+  - Web
   layers:
   - Default
   - TransparentFX
