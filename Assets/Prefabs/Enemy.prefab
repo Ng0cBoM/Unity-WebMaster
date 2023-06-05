@@ -116,7 +116,7 @@ Transform:
   - {fileID: 7738481836231527360}
   m_Father: {fileID: 4492508325370993987}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -2.6277}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -1.5020685}
 --- !u!1 &1652252451268604929
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +180,7 @@ Transform:
   - {fileID: 1054397103990896861}
   m_Father: {fileID: 1585244770471585247}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -91.08093}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -64.55238}
 --- !u!1 &2261907005840213204
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +299,7 @@ Transform:
   - {fileID: 2302532437643009547}
   m_Father: {fileID: 1585244770471585247}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 86.47253}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 89.44944}
 --- !u!1 &2904656774087273204
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,9 +310,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5456350551019718192}
   - component: {fileID: 4481835916067799374}
+  - component: {fileID: 6825870093807217213}
+  - component: {fileID: 4851066665671283275}
   m_Layer: 6
   m_Name: Weapon
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -384,6 +386,35 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!65 &6825870093807217213
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2904656774087273204}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.8000014, y: 1.0000005, z: 0.2}
+  m_Center: {x: 1.3999997, y: -0.5000012, z: 0}
+--- !u!114 &4851066665671283275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2904656774087273204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c1126ba14ad311499bf5744b5ba4d74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 7709857629380009484}
+  player: {fileID: 0}
+  isAttack: 0
+  boxCollider: {fileID: 0}
 --- !u!1 &3001486299124204482
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,7 +783,7 @@ Transform:
   - {fileID: 7590903837289358709}
   m_Father: {fileID: 6962127472429823492}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 14.734512}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.93212795}
 --- !u!1 &6255997209835303616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,7 +1068,7 @@ Transform:
   - {fileID: 4480999216800282695}
   m_Father: {fileID: 4492508325370993987}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -163.64673}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -79.26361}
 --- !u!1 &7709857629380009484
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,7 +1098,7 @@ Transform:
   m_GameObject: {fileID: 7709857629380009484}
   m_LocalRotation: {x: 0, y: 0, z: -0.009075678, w: 0.9999589}
   m_LocalPosition: {x: -1.7, y: 3.62, z: 0}
-  m_LocalScale: {x: -0.25, y: 0.25, z: 1}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7320668993486836972}
@@ -1138,6 +1169,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e79c1437b8b55594d9ca36cecc16ffab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMove: 0
+  weapon: {fileID: 2904656774087273204}
+  originalTimeScale: 0
+  particleSystem: {fileID: 0}
 --- !u!1 &8749393408972295985
 GameObject:
   m_ObjectHideFlags: 0
@@ -1170,7 +1205,7 @@ Transform:
   - {fileID: 7884754671939271583}
   m_Father: {fileID: 4492508325370993987}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 161.25917}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 142.54147}
 --- !u!1 &9120922825935010595
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,4 +1237,4 @@ Transform:
   - {fileID: 301932329500640183}
   m_Father: {fileID: 1585244770471585247}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -108.85878}
