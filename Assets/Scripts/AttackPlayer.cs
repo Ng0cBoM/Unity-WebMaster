@@ -8,7 +8,7 @@ public class AttackPlayer : MonoBehaviour
     public GameObject enemy;
     public GameObject player;
     public bool isAttack;
-    public BoxCollider boxCollider;
+    private BoxCollider boxCollider;
     private void Start()
     {
         enemyAnimator = enemy.GetComponent<Animator>();

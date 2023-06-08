@@ -1,5 +1,7 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -15,8 +17,11 @@ public class Enemy : MonoBehaviour
     public bool isMove;
     private float startX;
     public GameObject weapon;
-    public float originalTimeScale;
+    private float originalTimeScale;
+    private float originalOrthographicSize;
+    public CinemachineVirtualCamera virtualCamera;
     public ParticleSystem particleSystem;
+    public GameObject enemyDestroyManager;
     void Start()
     {
         m_Animator = gameObject.GetComponent<Animator>(); 
@@ -26,6 +31,7 @@ public class Enemy : MonoBehaviour
         isMove = true;
         startX = transform.position.x;
         originalTimeScale = Time.timeScale;
+        originalOrthographicSize = virtualCamera.m_Lens.OrthographicSize;
     }
 
     // Update is called once per frame
@@ -53,19 +59,42 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            GameManger.Instance.enemyCount -= 1;
             m_Animator.SetTrigger("die");
             m_BoxCollider.isTrigger = true;
             Instantiate(particleSystem, transform.position, particleSystem.transform.rotation);
-            StartCoroutine(SlowMotionCoroutine());
+            enemyDestroyManager.GetComponent<EnemyListDestroyManager>().ShowEnemyDestroy(GameManger.Instance.enemyCount);
+            if (GameManger.Instance.enemyCount == 0)
+            {
+                StartCoroutine(ZoomIn());
+            }
+            else
+            {
+                StartCoroutine(SlowMotionCoroutine());
+            }
         }
     }
     private IEnumerator SlowMotionCoroutine()
     {
         Time.timeScale = 0.1f;
-
         yield return new WaitForSecondsRealtime(1f);
-
         Time.timeScale = originalTimeScale;
+    }
+
+    private System.Collections.IEnumerator ZoomIn()
+    {
+        float elapsedTime = 0f;
+        Time.timeScale = 0.1f;
+        while (elapsedTime < 2f)
+        {
+            float t = elapsedTime / 2f;
+            virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, 7, t);
+            elapsedTime += Time.deltaTime*(originalTimeScale/Time.timeScale);
+            yield return null;
+        }
+        Time.timeScale = originalTimeScale;
+        virtualCamera.m_Lens.OrthographicSize = originalOrthographicSize;
+        UIManager.Instance.WinGame();
     }
 
     void StartAttack()

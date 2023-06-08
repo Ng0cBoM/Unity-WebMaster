@@ -12,6 +12,7 @@ TagManager:
   - Web
   - FxTemporaire
   - Weapon
+  - Enemy
   layers:
   - Default
   - TransparentFX

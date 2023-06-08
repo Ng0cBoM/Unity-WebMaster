@@ -15,14 +15,14 @@ public class PlayerController : MonoBehaviour
     public GameObject linePrefab;
     private LineRenderer lineRenderer;
 
-    public GameObject handControll;
-    public GameObject arrow;
+    public GameObject hand;
     public GameObject spiderWeb;
 
     public Animator animator;
 
     private bool isMovingphase1;
     private bool isMovingphase2;
+    private bool isPull;
 
     public LayerMask Wall;
     public LayerMask Enemy;
@@ -37,77 +37,84 @@ public class PlayerController : MonoBehaviour
         lineRenderer = linePrefab.GetComponent<LineRenderer>();
         linePrefab.SetActive(false);
         spiderWeb.SetActive(false);
-        arrow.SetActive(false);
         startRotation = transform.rotation;
+        isPull = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = -Camera.main.transform.position.z;
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        Vector3 directionMouse = (worldPosition - transform.position).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, directionMouse);
-
-        if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitWall, Mathf.Infinity, Wall))
+        if (UIManager.Instance.isGamePlay)
         {
-            Debug.DrawRay(transform.position, directionMouse * hitWall.distance, Color.red);
-            if (Input.GetMouseButton(0))
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = -Camera.main.transform.position.z;
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3 directionMouse = (worldPosition - transform.position).normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, directionMouse);
+
+            if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitWall, Mathf.Infinity, Wall))
             {
-                Time.timeScale = 0.1f;
-                arrow.SetActive(true);
-                linePrefab.SetActive(false);
-                spiderWeb.SetActive(false);
-                handControll.transform.rotation = targetRotation;
-                lineRenderer.SetPosition(1,transform.position);
-            }
-            if (Input.GetMouseButtonUp(0))
-            { 
-                Time.timeScale = 1f;
-                arrow.SetActive(false);
-                transform.rotation = targetRotation;
-                if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitEnemy, Mathf.Infinity, Enemy))
+                Debug.DrawRay(transform.position, directionMouse * hitWall.distance, Color.red);
+                if (Input.GetMouseButton(0) && UIManager.Instance.countTouch>0)
                 {
-                    Debug.DrawRay(transform.position, directionMouse * hitEnemy.distance, Color.green);
-                    if (hitEnemy.distance < hitWall.distance)
+                    hand.transform.position = worldPosition;
+                    lineRenderer.SetPosition(1, transform.position);
+                    Time.timeScale = 0.1f;
+                    linePrefab.SetActive(false);
+                    spiderWeb.SetActive(false);
+                }
+                if (Input.GetMouseButtonUp(0) && UIManager.Instance.countTouch > 0)
+                {
+                    Time.timeScale = 1f;
+                    transform.rotation = targetRotation;
+                    if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitEnemy, Mathf.Infinity, Enemy))
                     {
-                        spiderWebTarget = hitEnemy.point;
-                        enemyForce = hitEnemy.collider.GetComponent<Enemy>();
-                        enemyForce.Pull(-directionMouse);
+                        Debug.DrawRay(transform.position, directionMouse * hitEnemy.distance, Color.green);
+                        if (hitEnemy.distance < hitWall.distance)
+                        {
+                            spiderWebTarget = hitEnemy.point;
+                            isPull = true;
+                            enemyForce = hitEnemy.collider.GetComponent<Enemy>();
+                            if (enemyForce != null)
+                            {
+                                enemyForce.Pull(-directionMouse);
+                            }
+                        }
+                        else
+                        {
+                            spiderWebTarget = hitWall.point;
+                        }
                     }
                     else
                     {
                         spiderWebTarget = hitWall.point;
                     }
-                }
-                else
-                {
-                    spiderWebTarget = hitWall.point;
-                }
-                targetTag = hitWall.collider.gameObject.tag;
-                isMovingphase1 = true;
-                animator.SetBool("isClimingRight", false);
-                animator.SetBool("isClimingLeft", false);
-                animator.SetBool("isHang", false);
-                animator.SetBool("isFly", true);
-                targetPosition = hitWall.point;
-                pointStop.transform.position = targetPosition;
-                distancePlayer = Vector3.Distance(transform.position, targetPosition);
+                    targetTag = hitWall.collider.gameObject.tag;
+                    isMovingphase1 = true;
+                    animator.SetBool("isClimingRight", false);
+                    animator.SetBool("isClimingLeft", false);
+                    animator.SetBool("isHang", false);
+                    animator.SetBool("isFly", true);
+                    targetPosition = hitWall.point;
+                    pointStop.transform.position = targetPosition;
+                    distancePlayer = Vector3.Distance(transform.position, targetPosition);
 
+                }
+                if (isMovingphase1)
+                {
+                    linePrefab.SetActive(true);
+                    lineRenderer.SetPosition(0, transform.position);
+                    lineRenderer.SetPosition(1, spiderWeb.transform.position);
+                    MoveSpiderWeb();
+                }
+                if (isMovingphase2)
+                {
+                    MoveCharactor();
+                }
             }
-            if (isMovingphase1)
-            {
-                linePrefab.SetActive(true);
-                lineRenderer.SetPosition(0, transform.position);
-                lineRenderer.SetPosition(1, spiderWeb.transform.position);
-                MoveSpiderWeb();
-            }
-            if (isMovingphase2)
-            {
-                MoveCharactor();
-            }
+            UIManager.Instance.countTouch = 1;
         }
+        
     }
 
     void MoveSpiderWeb()
@@ -116,6 +123,10 @@ public class PlayerController : MonoBehaviour
         lineRenderer.SetPosition(1, spiderWeb.transform.position);
         if (spiderWeb.transform.position == spiderWebTarget)
         {
+            if (isPull)
+            {    
+                isPull = false;
+            }
             spiderWeb.SetActive(true);
             isMovingphase1 = false;
             isMovingphase2 = true;
@@ -135,11 +146,11 @@ public class PlayerController : MonoBehaviour
     }
     public void Stop()
     {
+        hand.transform.position = transform.position;
         speed = 15f;
         transform.rotation = startRotation;
         isMovingphase2 = false;
         linePrefab.SetActive(false);
-        arrow.SetActive(true);
         spiderWeb.SetActive(false);
     }
 
