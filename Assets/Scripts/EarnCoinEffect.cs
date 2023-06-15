@@ -7,6 +7,7 @@ using UnityEngine;
 public class EarnCoinEffect : MonoBehaviour
 {
     public GameObject pileOfCoins;
+    public GameObject coinText;
     public TextMeshProUGUI counter;
     private Vector2[] initialPos;
     private Quaternion[] initialRotation;
@@ -21,7 +22,7 @@ public class EarnCoinEffect : MonoBehaviour
         initialPos = new Vector2[coinsAmount];
         initialRotation = new Quaternion[coinsAmount];
 
-        for (int i = 0; i < pileOfCoins.transform.childCount; i++)
+        for (int i = 0; i < pileOfCoins.transform.childCount -1 ; i++)
         {
             initialPos[i] = pileOfCoins.transform.GetChild(i).GetComponent<RectTransform>().anchoredPosition;
             initialRotation[i] = pileOfCoins.transform.GetChild(i).GetComponent<RectTransform>().rotation;
@@ -50,11 +51,11 @@ public class EarnCoinEffect : MonoBehaviour
         pileOfCoins.SetActive(true);
         var delay = 0f;
 
-        for (int i = 0; i < pileOfCoins.transform.childCount; i++)
+        for (int i = 0; i < pileOfCoins.transform.childCount -1 ; i++)
         {
-            pileOfCoins.transform.GetChild(i).DOScale(1f, 0.3f).SetDelay(delay).SetEase(Ease.OutBack);
+            pileOfCoins.transform.GetChild(i).DOScale(1.5f, 0.3f).SetDelay(delay).SetEase(Ease.OutBack);
 
-            pileOfCoins.transform.GetChild(i).GetComponent<RectTransform>().DOAnchorPos(new Vector2(157, 290), 0.8f)
+            pileOfCoins.transform.GetChild(i).GetComponent<RectTransform>().DOAnchorPos(new Vector2(421, 778), 0.8f)
                 .SetDelay(delay + 0.1f).SetEase(Ease.InBack);
 
 

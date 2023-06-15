@@ -5,30 +5,30 @@ public class PlayerController : MonoBehaviour
     private float speed = 15f;
     private float speedWeb = 100f;
     private Vector3 targetPosition;
-    private float distancePlayer;
     private Quaternion startRotation;
+    private Quaternion targetRotation;
+    Quaternion playerRotation;
     private Vector3 spiderWebTarget;
 
     private string targetTag;
-    public GameObject pointStop;
 
     public GameObject linePrefab;
     private LineRenderer lineRenderer;
 
     public GameObject hand;
     public GameObject spiderWeb;
+    public GameObject arrow;
 
     public Animator animator;
 
     private bool isMovingphase1;
-    private bool isMovingphase2;
-    private bool isPull;
+    public bool isMovingphase2;
 
     public LayerMask Wall;
     public LayerMask Enemy;
-
-    private Enemy enemyForce;
     public ParticleSystem particleSystem;
+
+    private Rigidbody rb;
 
     void Start()
     {
@@ -37,8 +37,11 @@ public class PlayerController : MonoBehaviour
         lineRenderer = linePrefab.GetComponent<LineRenderer>();
         linePrefab.SetActive(false);
         spiderWeb.SetActive(false);
+        arrow.SetActive(false);
         startRotation = transform.rotation;
-        isPull = false;
+        hand.transform.position = transform.position;
+        rb = gameObject.GetComponent<Rigidbody>();
+
     }
 
     // Update is called once per frame
@@ -50,31 +53,44 @@ public class PlayerController : MonoBehaviour
             mousePosition.z = -Camera.main.transform.position.z;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             Vector3 directionMouse = (worldPosition - transform.position).normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, directionMouse);
+            targetRotation = Quaternion.LookRotation(Vector3.forward, directionMouse);
 
             if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitWall, Mathf.Infinity, Wall))
             {
                 Debug.DrawRay(transform.position, directionMouse * hitWall.distance, Color.red);
                 if (Input.GetMouseButton(0) && UIManager.Instance.countTouch>0)
                 {
+                    arrow.SetActive(true);
+                    arrow.transform.rotation = targetRotation;
                     hand.transform.position = worldPosition;
-                    lineRenderer.SetPosition(1, transform.position);
-                    Time.timeScale = 0.1f;
                     linePrefab.SetActive(false);
                     spiderWeb.SetActive(false);
+                    lineRenderer.SetPosition(1, transform.position);
+                    lineRenderer.SetPosition(0, transform.position);
+                    Time.timeScale = 0.1f;
+                    if (isMovingphase2)
+                    {
+                        isMovingphase2 = false;
+                        rb.useGravity = true;
+                        rb.isKinematic = false;
+                    }
                 }
                 if (Input.GetMouseButtonUp(0) && UIManager.Instance.countTouch > 0)
                 {
+                    rb.isKinematic = true;
+                    rb.useGravity = false;
+                    spiderWeb.transform.rotation = targetRotation;
+                    spiderWeb.SetActive(true);
+                    arrow.SetActive(false);
                     Time.timeScale = 1f;
-                    transform.rotation = targetRotation;
+                    playerRotation = targetRotation;
                     if (Physics.Raycast(transform.position, directionMouse, out RaycastHit hitEnemy, Mathf.Infinity, Enemy))
                     {
                         Debug.DrawRay(transform.position, directionMouse * hitEnemy.distance, Color.green);
                         if (hitEnemy.distance < hitWall.distance)
                         {
                             spiderWebTarget = hitEnemy.point;
-                            isPull = true;
-                            enemyForce = hitEnemy.collider.GetComponent<Enemy>();
+                            PullObject enemyForce = hitEnemy.collider.GetComponent<PullObject>();
                             if (enemyForce != null)
                             {
                                 enemyForce.Pull(-directionMouse);
@@ -89,6 +105,7 @@ public class PlayerController : MonoBehaviour
                     {
                         spiderWebTarget = hitWall.point;
                     }
+                    
                     targetTag = hitWall.collider.gameObject.tag;
                     isMovingphase1 = true;
                     animator.SetBool("isClimingRight", false);
@@ -96,19 +113,21 @@ public class PlayerController : MonoBehaviour
                     animator.SetBool("isHang", false);
                     animator.SetBool("isFly", true);
                     targetPosition = hitWall.point;
-                    pointStop.transform.position = targetPosition;
-                    distancePlayer = Vector3.Distance(transform.position, targetPosition);
+                    RetransFormTargetPosition();
+                    hand.transform.position = targetPosition;
 
                 }
                 if (isMovingphase1)
-                {
-                    linePrefab.SetActive(true);
+                {           
                     lineRenderer.SetPosition(0, transform.position);
                     lineRenderer.SetPosition(1, spiderWeb.transform.position);
+                    linePrefab.SetActive(true);
                     MoveSpiderWeb();
                 }
                 if (isMovingphase2)
                 {
+                    
+                    transform.rotation = playerRotation;
                     MoveCharactor();
                 }
             }
@@ -123,11 +142,7 @@ public class PlayerController : MonoBehaviour
         lineRenderer.SetPosition(1, spiderWeb.transform.position);
         if (spiderWeb.transform.position == spiderWebTarget)
         {
-            if (isPull)
-            {    
-                isPull = false;
-            }
-            spiderWeb.SetActive(true);
+            //spiderWeb.SetActive(true);
             isMovingphase1 = false;
             isMovingphase2 = true;
         }
@@ -135,37 +150,39 @@ public class PlayerController : MonoBehaviour
 
     void MoveCharactor()
     {
-
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-
-        if (Vector3.Distance(transform.position, targetPosition) <= distancePlayer * (9f / 10f))
-        {
-            speed = 25f;
-        }
+        if (transform.position == targetPosition) Stop(); 
         lineRenderer.SetPosition(0, transform.position);
     }
+
+    void RetransFormTargetPosition()
+    {
+        if (targetTag == "RightWall")
+        {
+            targetPosition += new Vector3(-0.5f,0,0);
+        }
+        if (targetTag == "LeftWall")
+        {
+            targetPosition += new Vector3(0.5f, 0, 0);
+        }
+        if (targetTag == "UnderWall")
+        {
+            targetPosition += new Vector3(0, -0.62f, 0);
+        }
+        if (targetTag == "AboveWall")
+        {
+            targetPosition += new Vector3(0, 0.62f, 0);
+        }
+    }
+
     public void Stop()
     {
+        rb.useGravity = false;
         hand.transform.position = transform.position;
-        speed = 15f;
         transform.rotation = startRotation;
         isMovingphase2 = false;
         linePrefab.SetActive(false);
         spiderWeb.SetActive(false);
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-
-        if (other.gameObject.CompareTag("Web"))
-        {
-            Stop();
-            particleSystem.Play();
-        }
         if (targetTag == "RightWall")
         {
             animator.SetBool("isClimingRight", true);
@@ -188,6 +205,21 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isHang", false);
             animator.SetBool("isFly", false);
         }
+    }
 
+    public void Beaten()
+    {
+        animator.SetTrigger("isHurt");
+       /* animator.SetBool("isClimingRight", false);
+        animator.SetBool("isClimingLeft", false);
+        animator.SetBool("isHang", false);
+        animator.SetBool("isFly", false);*/
+
+    }
+    void Death()
+    {
+        Time.timeScale = 1f;
+        Destroy(gameObject);
+        UIManager.Instance.LostGame();
     }
 }

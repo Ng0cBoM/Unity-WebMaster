@@ -7,6 +7,7 @@ public class AttackPlayer : MonoBehaviour
     private Animator enemyAnimator;
     public GameObject enemy;
     public GameObject player;
+    public bool nearPlayer;
     public bool isAttack;
     private BoxCollider boxCollider;
     private void Start()
@@ -17,39 +18,57 @@ public class AttackPlayer : MonoBehaviour
     }
     private void Update()
     {
-        if (Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 1)
+        if (player)
         {
-            if (Mathf.Abs(player.transform.position.x - enemy.transform.position.x) <= 2)
+            if (Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 1)
             {
-                if (isAttack == false)
+                if (Mathf.Abs(player.transform.position.x - enemy.transform.position.x) <= 1.2)
                 {
-                    enemyAnimator.SetBool("isAttack", true);
+                    nearPlayer = true;
+                    StartCoroutine(Attack());
                 }
-                if (Mathf.Sign(enemy.transform.localScale.x) != Mathf.Sign((player.transform.position - enemy.transform.position).normalized.x))
+                else
                 {
-                    enemy.transform.localScale = new Vector3(-1 * enemy.transform.localScale.x, enemy.transform.localScale.y, enemy.transform.localScale.z);
+                    nearPlayer = false;
+                    enemy.GetComponent<Enemy_V1>().isMove = true;
+                    enemyAnimator.SetBool("isAttack", false);
                 }
-                enemy.GetComponent<Enemy>().isMove = false;
             }
             else
             {
-                enemy.GetComponent<Enemy>().isMove = true;
+                nearPlayer = false;
+                enemy.GetComponent<Enemy_V1>().isMove = true;
                 enemyAnimator.SetBool("isAttack", false);
             }
         }
-        else
+    }
+
+    private IEnumerator  Attack()
+    {
+        if (Mathf.Sign(enemy.transform.localScale.x) != Mathf.Sign((player.transform.position - enemy.transform.position).normalized.x))
         {
-            enemy.GetComponent<Enemy>().isMove = true;
-            enemyAnimator.SetBool("isAttack", false);
+            enemy.transform.localScale = new Vector3(-1 * enemy.transform.localScale.x, enemy.transform.localScale.y, enemy.transform.localScale.z);
         }
+        enemy.GetComponent<Enemy_V1>().isMove = false;
+        yield return new WaitForSeconds(2f);
+
+        if (isAttack == false && nearPlayer == true)
+        {
+            enemyAnimator.SetBool("isAttack", true);
+        }
+        
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            if (isAttack ) Destroy(other.gameObject);
+            if (isAttack)
+            {
+                Time.timeScale = 0.2f;
+                nearPlayer = false;
+                player.GetComponent<PlayerController>().Beaten();
+                
+            }
         }
     }
-
-
 }

@@ -7,15 +7,19 @@ using UnityEngine.UI;
 public class PingPongCoin : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float duration = 1f; 
+    private float duration = 2f; 
     private float timer = 0f;
     private bool isIncreasing = true;
+    private bool isPingPong = true;
+
+    private float beforVariable;
     public Slider slider;
     public TextMeshProUGUI textCoin;
-    private bool isPingPong = true;
+    public Animator animator;
+    
     void Start()
     {
-        
+        beforVariable = 0;
     }
 
     // Update is called once per frame
@@ -25,7 +29,13 @@ public class PingPongCoin : MonoBehaviour
         {
             float variableValue = isIncreasing ? Mathf.PingPong(timer, duration) / duration : 1f - Mathf.PingPong(timer, duration) / duration;
             slider.value = variableValue;
-            textCoin.text =(100 * ReturnValuePingPong()+"");
+            if (beforVariable != ReturnValuePingPong())
+            {
+                textCoin.text = (100 * ReturnValuePingPong() + "");
+                beforVariable = ReturnValuePingPong();
+                animator.SetTrigger("Bounce");
+            }
+            
             timer += Time.deltaTime;
             if (timer > duration)
             {

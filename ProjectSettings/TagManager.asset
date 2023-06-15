@@ -13,6 +13,7 @@ TagManager:
   - FxTemporaire
   - Weapon
   - Enemy
+  - Box
   layers:
   - Default
   - TransparentFX

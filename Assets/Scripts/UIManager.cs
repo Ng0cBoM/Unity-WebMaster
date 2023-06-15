@@ -35,9 +35,6 @@ public class UIManager : MonoBehaviour
         isGamePlay=true;
         startGameUI.SetActive(false);
         playGameUI.SetActive(true);
-
-
-
     }
     public void ReplayGame()
     {
@@ -73,6 +70,12 @@ public class UIManager : MonoBehaviour
     {
         isGamePlay=false;
         winUI.SetActive(true);
+    }
+
+    public void LostGame()
+    {
+        lostUI.SetActive(true);
+        playGameUI.SetActive(false);
     }
 
     private void Awake()
