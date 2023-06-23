@@ -14,6 +14,9 @@ TagManager:
   - Weapon
   - Enemy
   - Box
+  - New tag
+  - Switch
+  - Barrel
   layers:
   - Default
   - TransparentFX
