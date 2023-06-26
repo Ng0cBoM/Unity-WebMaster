@@ -254,7 +254,7 @@ public class PlayerController : MonoBehaviour
             rb.useGravity = true;
             rb.isKinematic = false;
             Falling();
-            rb.AddForce(new Vector3(-1,1,0) * 20f, ForceMode.Impulse);
+            rb.AddForce(new Vector3(-1,1,0) * 300f, ForceMode.Impulse);
             targetCollide.GetComponent<Destroy>().DestroyBarrel();
         }
     }
