@@ -8,14 +8,14 @@ public class TrapController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<PlayerController>().Beaten();
+            collision.gameObject.GetComponent<PlayerController2>().Beaten();
         }
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            other.gameObject.GetComponent<PlayerController>().Beaten();
+            other.gameObject.GetComponent<PlayerController2>().Beaten();
         }
     }
 }

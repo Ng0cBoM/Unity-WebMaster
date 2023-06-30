@@ -44,7 +44,7 @@ public class GameManger : MonoBehaviour
         coin += quantity;
         WriteMoney();
     }
-    // Update is called once per frame
+
     private void Awake()
     {
         if (Instance == null)

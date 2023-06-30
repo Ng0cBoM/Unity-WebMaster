@@ -7,6 +7,7 @@ using static Cinemachine.CinemachineImpulseManager.ImpulseEvent;
 public class TrapLaserController : MonoBehaviour
 {
     public GameObject switchControll;
+    public GameObject particle;
     private string state;
     private LineRenderer lineRenderer;
     public LayerMask layerMask;
@@ -27,14 +28,16 @@ public class TrapLaserController : MonoBehaviour
                 lineRenderer.SetPosition(1, hit.point);
                 if (hit.collider.gameObject.CompareTag("Player"))
                 {
-                    hit.collider.gameObject.GetComponent<PlayerController>().Beaten();
+                    hit.collider.gameObject.GetComponent<PlayerController2>().Beaten();
                 }
             }
+            particle.SetActive(true);
         }
         else if (state == "Off")
         {
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, transform.position);
+            particle.SetActive(false);
         }
     }
 }

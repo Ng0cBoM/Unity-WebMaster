@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,14 @@ public class PingPongCoin : MonoBehaviour
     public Slider slider;
     public TextMeshProUGUI textCoin;
     public Animator animator;
-    
+
+    public static PingPongCoin Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         beforVariable = 0;
@@ -63,6 +71,11 @@ public class PingPongCoin : MonoBehaviour
         { 
             return 5;
         }
+    }
+
+    public void BonusButtonDown()
+    {
+        AdsManager.Instance.BonusRewrard();
     }
 
     public void GetValuePingPong()

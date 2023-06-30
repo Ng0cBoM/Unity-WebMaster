@@ -68,7 +68,7 @@ public class AttackPlayer : MonoBehaviour
             {
                 Time.timeScale = 0.2f;
                 nearPlayer = false;
-                other.GetComponent<PlayerController>().Beaten();
+                other.GetComponent<PlayerController2>().Beaten();
             }
         }
     }

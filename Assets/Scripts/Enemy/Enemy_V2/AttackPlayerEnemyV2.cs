@@ -1,3 +1,4 @@
+using EgdFoundation;
 using UnityEngine;
 
 public class AttackPlayerEnemyV2 : MonoBehaviour
@@ -17,7 +18,7 @@ public class AttackPlayerEnemyV2 : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            if (other.GetComponent<PlayerController>().isMovingphase2)
+            if (other.GetComponent<PlayerController2>().isFlying)
             {
                 backDamage = true;
                 enemy.GetComponent<Enemy_V2>().isThrow = false;
@@ -25,7 +26,7 @@ public class AttackPlayerEnemyV2 : MonoBehaviour
             else if (!backDamage && GameManger.Instance.isPlay)
             {
                 Time.timeScale = 0.2f;
-                other.GetComponent<PlayerController>().Beaten();
+                other.GetComponent<PlayerController2>().Beaten();
             } 
         }
         if (other.gameObject.CompareTag("Enemy") && backDamage)

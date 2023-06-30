@@ -12,7 +12,7 @@ public class KillPlayer : MonoBehaviour
         {
             count++;
             Debug.Log("Die");
-            collision.gameObject.GetComponent<PlayerController>().Beaten();
+            collision.gameObject.GetComponent<PlayerController2>().Beaten();
         }
     }
 /*    private void OnTriggerEnter(Collider other)

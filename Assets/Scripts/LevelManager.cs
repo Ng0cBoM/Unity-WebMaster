@@ -4,7 +4,6 @@ using System.IO;
 
 public class LevelManager : MonoBehaviour
 {
-    // Start is called before the first frame update
     public static LevelManager Instance;
     private string filePath;
     void Start()

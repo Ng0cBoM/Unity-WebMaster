@@ -27,8 +27,8 @@ public class UIManager : MonoBehaviour
         playGameUI.SetActive(false);
         isGamePlay = false;
         countTouch = 0;
-        levelWin.text = "LEVEL " + (LevelManager.Instance.CurrentLevel() + 1);
-        levelLost.text = "LEVEL " + (LevelManager.Instance.CurrentLevel() + 1);
+        /*levelWin.text = "LEVEL " + (LevelManager.Instance.CurrentLevel() + 1);
+        levelLost.text = "LEVEL " + (LevelManager.Instance.CurrentLevel() + 1);*/
     }
 
     // Update is called once per frame
@@ -40,12 +40,16 @@ public class UIManager : MonoBehaviour
     }
     public void ReplayGame()
     {
-        LevelManager.Instance.LoadSceneByID(LevelManager.Instance.CurrentLevel());
+        //LevelManager.Instance.LoadSceneByID(LevelManager.Instance.CurrentLevel());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+
     }
     public void NextLevel()
     {
-        LevelManager.Instance.NextLevel();
-        LevelManager.Instance.LoadSceneByID(LevelManager.Instance.CurrentLevel());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        /*LevelManager.Instance.NextLevel();
+        LevelManager.Instance.LoadSceneByID(LevelManager.Instance.CurrentLevel());*/
     }
 
     public void OpenSetting()
